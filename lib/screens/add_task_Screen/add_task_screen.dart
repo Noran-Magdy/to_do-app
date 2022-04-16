@@ -1,3 +1,4 @@
+import 'package:calender_app/modules/buttons.dart';
 import 'package:calender_app/modules/input_field.dart';
 import 'package:calender_app/shared/components/colors.dart';
 import 'package:calender_app/shared/components/text_style.dart';
@@ -16,7 +17,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   DateTime selectedDate = DateTime.now();
   String startTime = DateFormat('hh:mm a').format(DateTime.now()).toString();
   String endTime = '9:30 PM';
-  @override
+  int selectedRemind = 5;
+  int selectedColor = 0;
+  List<int> remindList = [
+    5,
+    10,
+    15,
+    20,
+  ];
+
+  String selectedRepeat = 'None';
+  List<String> repeatList = [
+    'None',
+    'Daily',
+    'Weekly',
+    'Monthly',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -102,11 +119,135 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                   ],
                 ),
+                InputField(
+                  title: "Remind",
+                  hint: "$selectedRemind minutes early",
+                  widget: DropdownButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey,
+                    ),
+                    iconSize: 32,
+                    elevation: 4,
+                    style: formFieldStyle(),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    items:
+                        remindList.map<DropdownMenuItem<String>>((int value) {
+                      return DropdownMenuItem<String>(
+                        value: value.toString(),
+                        child: Text('$value'),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedRemind = int.parse(value!);
+                        debugPrint(selectedRemind.toString());
+                      });
+                    },
+                  ),
+                ),
+                InputField(
+                  title: "Repeat",
+                  hint: selectedRepeat,
+                  widget: DropdownButton(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey,
+                    ),
+                    iconSize: 32,
+                    elevation: 4,
+                    style: formFieldStyle(),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    items: repeatList
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedRepeat = value!;
+                        debugPrint(selectedRemind.toString());
+                      });
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 18,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _colorPallete(),
+                      DefaultButtons(
+                        label: 'Create Task',
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  _colorPallete() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Color',
+          style: titleStyle(),
+        ),
+        const SizedBox(
+          height: 8,
+        ),
+        Wrap(
+          children: List<Widget>.generate(
+            3,
+            (index) {
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    selectedColor = index;
+                    debugPrint(selectedColor.toString());
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: 8.0,
+                  ),
+                  child: CircleAvatar(
+                    radius: 14,
+                    backgroundColor: index == 0
+                        ? blueColor
+                        : index == 1
+                            ? pinkColor
+                            : yellowColor,
+                    child: selectedColor == index
+                        ? const Icon(
+                            Icons.done,
+                            color: Colors.white,
+                            size: 16,
+                          )
+                        : Container(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -154,30 +295,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     }
   }
 
-  _getTimeFromUser({bool? isStartTime}) {
-    var _pickedTime = _showTimePicker();
-    String _formatedTime = _pickedTime.formate();
-    if (_pickedTime == null) {
-      debugPrint('something wrong');
-    } else if (isStartTime == true) {
-      setState(() {
-        startTime = _formatedTime;
-      });
-    } else if (isStartTime == false) {
-      setState(() {
-        endTime = _formatedTime;
-      });
-    }
-  }
-
-  _showTimePicker() {
+  _getTimeFromUser({required bool isStartTime}) {
     showTimePicker(
       initialEntryMode: TimePickerEntryMode.input,
       context: context,
-      initialTime: const TimeOfDay(
-        hour: 9,
-        minute: 10,
+      initialTime: TimeOfDay(
+        //started time >> 10:30 AM
+        hour: int.parse(startTime.split(':')[0]),
+        minute: int.parse(startTime.split(":")[1].split(' ')[0]),
       ),
-    );
+    ).then((value) {
+      debugPrint(value.toString());
+      String? _formatedTime = value?.format(context);
+      debugPrint(" formatedTime $_formatedTime");
+      if (isStartTime == true) {
+        debugPrint(_formatedTime);
+        setState(() {
+          startTime = _formatedTime!;
+        });
+      } else if (isStartTime == false) {
+        debugPrint(_formatedTime);
+        setState(() {
+          endTime = _formatedTime!;
+        });
+      }
+    });
   }
 }

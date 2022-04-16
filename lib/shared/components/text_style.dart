@@ -33,7 +33,7 @@ TextStyle textButtonStyle() {
     textStyle: const TextStyle(
       fontWeight: FontWeight.w500,
       color: whiteColor,
-      fontSize: 16.5,
+      fontSize: 16,
     ),
   );
 }
