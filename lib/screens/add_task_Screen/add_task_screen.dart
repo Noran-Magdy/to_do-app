@@ -1,7 +1,9 @@
+import 'package:calender_app/models/task_model.dart';
 import 'package:calender_app/modules/buttons.dart';
 import 'package:calender_app/modules/input_field.dart';
 import 'package:calender_app/shared/components/colors.dart';
 import 'package:calender_app/shared/components/text_style.dart';
+import 'package:calender_app/shared/controllers/task_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -14,11 +16,18 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen> {
+  TaskController taskController = Get.put(TaskController());
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController noteController = TextEditingController();
+
   DateTime selectedDate = DateTime.now();
   String startTime = DateFormat('hh:mm a').format(DateTime.now()).toString();
   String endTime = '9:30 PM';
-  int selectedRemind = 5;
+
   int selectedColor = 0;
+
+  int selectedRemind = 5;
   List<int> remindList = [
     5,
     10,
@@ -56,13 +65,15 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   'Add Task',
                   style: headerStyle(),
                 ),
-                const InputField(
+                InputField(
                   title: 'Title',
                   hint: 'Enter your title',
+                  controller: titleController,
                 ),
-                const InputField(
+                InputField(
                   title: 'Note',
                   hint: 'Enter your note',
+                  controller: noteController,
                 ),
                 InputField(
                   title: 'Date',
@@ -188,7 +199,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       _colorPallete(),
                       DefaultButtons(
                         label: 'Create Task',
-                        onTap: () {},
+                        onTap: () {
+                          _validateDate();
+                        },
                       ),
                     ],
                   ),
@@ -199,6 +212,42 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
         ),
       ),
     );
+  }
+
+  _validateDate() {
+    if (titleController.text.isNotEmpty && noteController.text.isNotEmpty) {
+      _addDataToDataBase();
+      Get.back();
+    } else if (titleController.text.isEmpty || noteController.text.isEmpty) {
+      Get.snackbar('Required', 'All fields are required !',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.white,
+          colorText: pinkColor,
+          icon: const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red,
+          ));
+    }
+  }
+
+  _addDataToDataBase() async {
+    await taskController
+        .addTask(
+      task: TaskModel(
+        title: titleController.text,
+        note: noteController.text,
+        startTime: startTime,
+        endTime: endTime,
+        date: DateFormat.yMd().format(selectedDate),
+        remind: selectedRemind,
+        repeat: selectedRepeat,
+        isCompleted: 0,
+        color: selectedColor,
+      ),
+    )
+        .then((value) {
+      debugPrint('my database is' '$value');
+    });
   }
 
   _colorPallete() {
@@ -308,7 +357,9 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
       debugPrint(value.toString());
       String? _formatedTime = value?.format(context);
       debugPrint(" formatedTime $_formatedTime");
-      if (isStartTime == true) {
+      if (value == null) {
+        debugPrint('time cancle');
+      } else if (isStartTime == true) {
         debugPrint(_formatedTime);
         setState(() {
           startTime = _formatedTime!;

@@ -5,6 +5,7 @@ class Themes {
   static final light = ThemeData(
     brightness: Brightness.light,
     backgroundColor: whiteColor,
+    highlightColor: blueColor,
     colorScheme: const ColorScheme.light().copyWith(
       primary: blueColor,
     ),
@@ -12,8 +13,9 @@ class Themes {
   static final dark = ThemeData(
     brightness: Brightness.dark,
     backgroundColor: darkBackgroundColor,
+    highlightColor: blueColor,
     colorScheme: const ColorScheme.dark().copyWith(
-      primary: darkBackgroundColor,
+      primary: Colors.white,
     ),
   );
 }

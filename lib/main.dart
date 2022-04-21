@@ -1,5 +1,6 @@
 import 'package:calender_app/screens/home_screen/home_Screen.dart';
 import 'package:calender_app/shared/components/theme.dart';
+import 'package:calender_app/shared/database/db_helper.dart';
 import 'package:calender_app/shared/services/theme_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DBHelper.initDb();
   await GetStorage.init();
   runApp(const MyApp());
 }

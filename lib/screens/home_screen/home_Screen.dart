@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _defaultAppBar(),
+      backgroundColor: context.theme.backgroundColor,
       body: Column(
         children: [
           _addTaskBar(),
