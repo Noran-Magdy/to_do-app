@@ -4,6 +4,7 @@ import 'package:calender_app/modules/buttons.dart';
 import 'package:calender_app/screens/add_task_Screen/add_task_screen.dart';
 import 'package:calender_app/shared/components/colors.dart';
 import 'package:calender_app/shared/components/text_style.dart';
+import 'package:calender_app/shared/controllers/task_controller.dart';
 import 'package:calender_app/shared/services/notification_service.dart';
 import 'package:calender_app/shared/services/theme_services.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var notifyHelper = NotifyHelper();
   DateTime selectedDate = DateTime.now();
+  final taskControlller = Get.put(TaskController());
 
   @override
   void initState() {
@@ -40,7 +42,34 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _addTaskBar(),
           _addDateBar(),
+          _showTaskes(),
         ],
+      ),
+    );
+  }
+
+  _showTaskes() {
+    return Expanded(
+      child: GetBuilder<TaskController>(
+        builder: (_) {
+          return ListView.builder(
+            itemCount: _.taskList.length,
+            itemBuilder: (context, index) {
+              debugPrint('task length');
+              debugPrint(_.taskList.length.toString());
+              return Container(
+                height: 50,
+                width: 100,
+                margin: const EdgeInsets.only(
+                  bottom: 10,
+                ),
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
@@ -114,8 +143,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           DefaultButtons(
             label: ' + Add Task',
-            onTap: () {
-              Get.to(const AddTaskScreen());
+            onTap: () async {
+              await Get.to(const AddTaskScreen());
+              taskControlller.getTasks();
             },
           ),
         ],

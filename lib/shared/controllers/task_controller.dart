@@ -5,7 +5,13 @@ import 'package:calender_app/shared/database/db_helper.dart';
 import 'package:get/get.dart';
 
 class TaskController extends GetxController {
-  var taskList = <TaskModel>[].obs;
+  var taskList = <TaskModel>[];
+
+  @override
+  void onReady() {
+    getTasks();
+    super.onReady();
+  }
 
 //add task data to table
   Future<int> addTask({TaskModel? task}) async {
