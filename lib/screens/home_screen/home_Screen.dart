@@ -1,8 +1,10 @@
 // ignore_for_file: file_names
 
+import 'package:calender_app/models/task_model.dart';
 import 'package:calender_app/modules/buttons.dart';
 import 'package:calender_app/screens/add_task_Screen/add_task_screen.dart';
 import 'package:calender_app/shared/components/colors.dart';
+import 'package:calender_app/modules/task_title.dart';
 import 'package:calender_app/shared/components/text_style.dart';
 import 'package:calender_app/shared/controllers/task_controller.dart';
 import 'package:calender_app/shared/services/notification_service.dart';
@@ -12,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:date_picker_timeline/date_picker_timeline.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -42,6 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _addTaskBar(),
           _addDateBar(),
+          const SizedBox(
+            height: 10,
+          ),
           _showTaskes(),
         ],
       ),
@@ -57,19 +63,75 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               debugPrint('task length');
               debugPrint(_.taskList.length.toString());
-              return Container(
-                height: 50,
-                width: 100,
-                margin: const EdgeInsets.only(
-                  bottom: 10,
-                ),
-                decoration: const BoxDecoration(
-                  color: Colors.green,
+              return AnimationConfiguration.staggeredList(
+                position: index,
+                child: SlideAnimation(
+                  child: FadeInAnimation(
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showBottomSheet(context, _.taskList[index]);
+                          },
+                          child: TaskTile(
+                            _.taskList[index],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  _bottomSheetButtons({
+    required String label,
+    required Function() onTap,
+    required Color color,
+    bool isClosed = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+      ),
+    );
+  }
+
+  _showBottomSheet(BuildContext context, TaskModel task) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.only(top: 4),
+        height: task.isCompleted == 1
+            ? MediaQuery.of(context).size.height * 0.24
+            : MediaQuery.of(context).size.height * 0.32,
+        color: Get.isDarkMode ? darkBackgroundColor : whiteColor,
+        child: Column(
+          children: [
+            Container(
+              height: 6,
+              width: 120,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300],
+              ),
+            ),
+            task.isCompleted == 1
+                ? Container()
+                : _bottomSheetButtons(
+                    label: 'Task Completed',
+                    onTap: () {
+                      Get.back();
+                    },
+                    color: blueColor,
+                  ),
+          ],
+        ),
       ),
     );
   }

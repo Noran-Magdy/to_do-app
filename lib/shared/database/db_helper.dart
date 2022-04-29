@@ -51,4 +51,9 @@ class DBHelper {
     debugPrint('query function called');
     return await _db!.query(_tabelName);
   }
+
+  static delete(TaskModel task) async {
+    debugPrint('delete function called');
+    return await _db!.delete(_tabelName, where: 'id=?', whereArgs: [task.id]);
+  }
 }
