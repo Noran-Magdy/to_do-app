@@ -29,6 +29,7 @@ class TaskController extends GetxController {
 //delete data from table
   void delete(TaskModel task) {
     DBHelper.delete(task);
+
     update();
   }
 }

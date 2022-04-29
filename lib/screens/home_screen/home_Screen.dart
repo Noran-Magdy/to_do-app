@@ -93,12 +93,37 @@ class _HomeScreenState extends State<HomeScreen> {
     required String label,
     required Function() onTap,
     required Color color,
-    bool isClosed = false,
+    required BuildContext context,
+    bool isClose = false,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
+        height: 55,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          color: isClose ? Colors.transparent : color,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            width: 2,
+            color: isClose
+                ? Get.isDarkMode
+                    ? Colors.grey[600]!
+                    : Colors.grey[300]!
+                : color,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: isClose
+                ? titleStyle()
+                : titleStyle().copyWith(
+                    color: Colors.white,
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -121,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Get.isDarkMode ? Colors.grey[600] : Colors.grey[300],
               ),
             ),
+            const Spacer(),
             task.isCompleted == 1
                 ? Container()
                 : _bottomSheetButtons(
@@ -129,7 +155,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       Get.back();
                     },
                     color: blueColor,
+                    context: context,
                   ),
+            _bottomSheetButtons(
+              label: 'Delete Task',
+              onTap: () {
+                taskControlller.delete(task);
+                taskControlller.getTasks();
+                Get.back();
+              },
+              color: Colors.red[400]!,
+              context: context,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            _bottomSheetButtons(
+              label: 'Close',
+              onTap: () {
+                Get.back();
+              },
+              color: Colors.red[400]!,
+              isClose: true,
+              context: context,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),
