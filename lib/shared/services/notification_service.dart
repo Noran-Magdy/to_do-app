@@ -1,3 +1,4 @@
+import 'package:calender_app/models/task_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
@@ -63,7 +64,7 @@ class NotifyHelper {
     debugPrint('doone');
   }
 
-  scheduledNotification() async {
+  scheduledNotification(int hour, int minutes, TaskModel task) async {
     await flutterLocalNotificationsPlugin.zonedSchedule(
         0,
         'scheduled title',

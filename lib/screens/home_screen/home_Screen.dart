@@ -67,6 +67,15 @@ class _HomeScreenState extends State<HomeScreen> {
               TaskModel task = _.taskList[index];
               debugPrint(task.toJson().toString());
               if (task.repeat == 'Daily') {
+                DateTime date =
+                    DateFormat.jm().parse(task.startTime.toString());
+                var myTime = DateFormat('HH:mm').format(date);
+                debugPrint('date formated start time is $myTime');
+                notifyHelper.scheduledNotification(
+                  int.parse(myTime.toString().split(':')[0]),
+                  int.parse(myTime.toString().split(':')[1]),
+                  task,
+                );
                 return AnimationConfiguration.staggeredList(
                   position: index,
                   child: SlideAnimation(
@@ -314,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? "Activated Dark Theme"
                 : "Activated Light Theme",
           );
+
           debugPrint('tapped');
         },
         child: Icon(
