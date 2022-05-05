@@ -14,9 +14,9 @@ class DBHelper {
   static const int _version = 1;
   static const String _tabelName = 'tasks';
 
-  static Future<Database> initDb() async {
+  static Future<void> initDb() async {
     if (_db != null) {
-      return _db!;
+      return;
     }
     try {
       String _path = join(await getDatabasesPath() + 'tasks.db');
@@ -25,20 +25,20 @@ class DBHelper {
         version: _version,
         onCreate: (db, version) {
           print('creating a new one');
-          return db.execute("CREATE TABLE $_tabelName("
-              "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-              "title STRING, note TEXT, date STRING, "
-              "startTime STRING, endTime STRING, "
-              "remind INTEGER, repeat STRING, "
-              "color INTEGER, "
-              "isCompleted INTEGER, ");
+          return db.execute(
+            "CREATE TABLE $_tabelName("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "title STRING, note TEXT, date STRING, "
+            "startTime STRING, endTime STRING, "
+            "remind INTEGER, repeat STRING, "
+            "color INTEGER, "
+            "isCompleted INTEGER)",
+          );
         },
       );
     } catch (e) {
       debugPrint(e.toString());
     }
-
-    return _db!;
   }
 
   static Future<int> insert(TaskModel task) async {
@@ -49,11 +49,21 @@ class DBHelper {
 
   static Future<List<Map<String, dynamic>>> query() async {
     debugPrint('query function called');
-    return await _db!.query(_tabelName);
+    return await _db?.query(_tabelName) ?? [];
   }
 
   static delete(TaskModel task) async {
     debugPrint('delete function called');
-    return await _db!.delete(_tabelName, where: 'id=?', whereArgs: [task.id]);
+    return await _db?.delete(_tabelName, where: 'id=?', whereArgs: [task.id]) ??
+        1;
+  }
+
+  static update(int id) async {
+    debugPrint('updated table');
+    return await _db?.rawUpdate('''
+UPDATE tasks 
+SET isCompleted = ?
+  WHERE id = ?
+''', [1, id]);
   }
 }

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
 
 class NotifyHelper {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin(); //
 
   initializeNotification() async {
-    //tz.FlutterNativeTimezone.getLocalTimezone();
+    tz.initializeTimeZones();
     final IOSInitializationSettings initializationSettingsIOS =
         IOSInitializationSettings(
             requestSoundPermission: false,
@@ -61,26 +63,22 @@ class NotifyHelper {
     debugPrint('doone');
   }
 
-  // scheduledNotification() async {
-  //   await flutterLocalNotificationsPlugin.zonedSchedule(
-  //       0,
-  //       'scheduled title',
-  //       'theme changes 5 seconds ago',
-
-  //       tz.FlutterNativeTimezone.getAvailableTimezones().
-
-  //       now(tz.FlutterNativeTimezone.getLocalTimezone())
-  //           .add(const Duration(seconds: 5)),
-  //       const NotificationDetails(
-  //           android: AndroidNotificationDetails(
-  //         'your channel id',
-  //         'your channel name',
-  //         channelDescription: 'your channel description',
-  //       )),
-  //       androidAllowWhileIdle: true,
-  //       uiLocalNotificationDateInterpretation:
-  //           UILocalNotificationDateInterpretation.absoluteTime);
-  // }
+  scheduledNotification() async {
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+        0,
+        'scheduled title',
+        'theme changes 5 seconds ago',
+        tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
+        const NotificationDetails(
+            android: AndroidNotificationDetails(
+          'your channel id',
+          'your channel name',
+          channelDescription: 'your channel description',
+        )),
+        androidAllowWhileIdle: true,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime);
+  }
 
   Future selectNotification(String? payload) async {
     if (payload != null) {

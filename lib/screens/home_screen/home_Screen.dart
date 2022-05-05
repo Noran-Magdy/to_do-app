@@ -33,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     notifyHelper = NotifyHelper();
     notifyHelper.initializeNotification();
+
     // NotifyHelper().requestIOSPermissions();
   }
 
@@ -63,25 +64,52 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               debugPrint('task length');
               debugPrint(_.taskList.length.toString());
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                child: SlideAnimation(
-                  child: FadeInAnimation(
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showBottomSheet(context, _.taskList[index]);
-                          },
-                          child: TaskTile(
-                            _.taskList[index],
+              TaskModel task = _.taskList[index];
+              debugPrint(task.toJson().toString());
+              if (task.repeat == 'Daily') {
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  child: SlideAnimation(
+                    child: FadeInAnimation(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              _showBottomSheet(context, task);
+                            },
+                            child: TaskTile(
+                              task,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
+                );
+              }
+              if (task.date == DateFormat.yMd().format(selectedDate)) {
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  child: SlideAnimation(
+                    child: FadeInAnimation(
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              _showBottomSheet(context, task);
+                            },
+                            child: TaskTile(
+                              task,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Container();
+              }
             },
           );
         },
@@ -152,7 +180,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 : _bottomSheetButtons(
                     label: 'Task Completed',
                     onTap: () {
+                      taskControlller.markTaskCompleted(task.id!);
+
                       Get.back();
+                      debugPrint('Completed success');
                     },
                     color: blueColor,
                     context: context,
@@ -161,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Delete Task',
               onTap: () {
                 taskControlller.delete(task);
-                taskControlller.getTasks();
+
                 Get.back();
               },
               color: Colors.red[400]!,
@@ -223,7 +254,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         onDateChange: (date) {
-          selectedDate = date;
+          setState(() {
+            selectedDate = date;
+          });
+
           debugPrint(selectedDate.toIso8601String());
         },
       ),
@@ -291,9 +325,9 @@ class _HomeScreenState extends State<HomeScreen> {
       actions: const [
         CircleAvatar(
           backgroundImage: NetworkImage(
-            'https://image.shutterstock.com/image-illustration/male-user-icon-isolated-on-260nw-405711598.jpg',
+            'https://i.pinimg.com/564x/b6/14/11/b61411fce1f02a043392c808f577576a.jpg',
           ),
-          radius: 22,
+          radius: 20,
         ),
         SizedBox(
           width: 20,
