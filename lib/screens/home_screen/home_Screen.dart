@@ -60,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GetBuilder<TaskController>(
         builder: (_) {
           return ListView.builder(
+            physics: const BouncingScrollPhysics(),
             itemCount: _.taskList.length,
             itemBuilder: (context, index) {
               debugPrint('task length');
@@ -211,9 +212,9 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 20,
             ),
             _bottomSheetButtons(
-              label: 'Close',
+              label: 'Cancel Notification ',
               onTap: () {
-                Get.back();
+                notifyHelper.cancelNotification(task);
               },
               color: Colors.red[400]!,
               isClose: true,
