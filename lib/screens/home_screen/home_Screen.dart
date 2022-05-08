@@ -215,6 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'Cancel Notification ',
               onTap: () {
                 notifyHelper.cancelNotification(task);
+                Get.back();
               },
               color: Colors.red[400]!,
               isClose: true,
